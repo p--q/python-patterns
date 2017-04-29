@@ -1,4 +1,7 @@
 eclipse.preferences.version=1
 encoding//src/behavioral/catalog.py=utf-8
+encoding//src/behavioral/strategy.py=utf-8
+encoding//src/tests/test_adapter.py=utf-8
 encoding//src/tests/test_facade.py=utf-8
+encoding//src/tests/test_lazy.py=utf-8
 encoding//src/tests/test_strategy.py=utf-8
