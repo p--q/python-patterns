@@ -14,6 +14,7 @@ install:
   - travis_retry pip install -q coveralls codecov
 
 script:
+  - cd python-patterns/src
   # Run tests
   - nosetests --with-doctest --with-cov  --cover-erase --cover-branches --cover-package .
 
