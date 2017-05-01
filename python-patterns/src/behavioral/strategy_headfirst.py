@@ -58,7 +58,11 @@ if __name__ == '__main__':
     decoy.performQuack()
    
     model.performFly()  
-    model.performFly = flyRocketPowered
+    model.performFly = flyRocketPowered  # インスタンスのメソッドを置換。
     model.performFly()
     
+    model2 = ModelDuck()
+    model2.performFly()  # 他のインスタンスのメソッドは置換されない。
+    
+
     
