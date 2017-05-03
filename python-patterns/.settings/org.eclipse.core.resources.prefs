@@ -1,0 +1,14 @@
+eclipse.preferences.version=1
+encoding//src/behavioral/catalog.py=utf-8
+encoding//src/behavioral/iterator.py=utf-8
+encoding//src/behavioral/memento.py=utf-8
+encoding//src/behavioral/observer.py=utf-8
+encoding//src/behavioral/publish_subscribe.py=utf-8
+encoding//src/behavioral/strategy.py=utf-8
+encoding//src/behavioral/strategy_headfirst.py=utf-8
+encoding//src/tests/test_abstract_factory.py=utf-8
+encoding//src/tests/test_adapter.py=utf-8
+encoding//src/tests/test_command.py=utf-8
+encoding//src/tests/test_facade.py=utf-8
+encoding//src/tests/test_lazy.py=utf-8
+encoding//src/tests/test_strategy.py=utf-8
