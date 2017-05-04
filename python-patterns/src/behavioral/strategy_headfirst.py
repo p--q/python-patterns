@@ -10,13 +10,17 @@ class FlyBehavior:
     def flyRocketPowered(self):
         print(self.name + " is flying with a rocket")      
 class QuackBehavior: 
-    def muteQuack(self):
+    @staticmethod
+    def muteQuack():
         print("<< Silence >>")
-    def quack(self):
+    @staticmethod
+    def quack():
         print("Quack")
-    def squeak(self):
+    @staticmethod
+    def squeak():
         print("Squeak")
-    def fakeQuack(self):
+    @staticmethod
+    def fakeQuack():
         print("Qwak")
 class Duck: 
     def swim(self):
@@ -24,41 +28,36 @@ class Duck:
 class DecoyDuck(Duck):
     def __init__(self,name):
         self.flyBehavior = FlyBehavior(name)
-        self.quackBehavior = QuackBehavior()
         self.performFly = self.flyBehavior.flyWithWings
-        self.performQuack = self.quackBehavior.quack        
+        self.performQuack = QuackBehavior.quack        
     def display(self):
         print(self.name + " is a duck Decoy")
 class MallardDuck(Duck):
     def __init__(self,name):
         self.flyBehavior = FlyBehavior(name)
-        self.quackBehavior = QuackBehavior()
         self.performFly = self.flyBehavior.flyWithWings
-        self.performQuack = self.quackBehavior.quack
+        self.performQuack = QuackBehavior.quack
     def display(self):
         print(self.name + " is a real Mallard duck")
 class ModelDuck(Duck):
     def __init__(self,name):
         self.flyBehavior = FlyBehavior(name)
-        self.quackBehavior = QuackBehavior()
         self.performFly = self.flyBehavior.flyNoWay 
-        self.performQuack = self.quackBehavior.quack
+        self.performQuack = QuackBehavior.quack
     def display(self):
         print(self.name + " is a model duck")
 class RedHeadDuck(Duck):
     def __init__(self,name):
         self.flyBehavior = FlyBehavior(name)
-        self.quackBehavior = QuackBehavior()
         self.performFly = self.flyBehavior.flyWithWings
-        self.performQuack = self.quackBehavior.quack
+        self.performQuack = QuackBehavior.quack
     def display(self):
         print(self.name + " is a real Red Headed duck")     
 class RubberDuck(Duck):
     def __init__(self,name):
         self.flyBehavior = FlyBehavior(name)
-        self.quackBehavior = QuackBehavior()
         self.performFly = self.flyBehavior.flyNoWay 
-        self.performQuack = self.quackBehavior.squeak
+        self.performQuack = QuackBehavior.squeak
     def display(self):
         print(self.name + " is a rubber duckie")   
 if __name__ == '__main__':
