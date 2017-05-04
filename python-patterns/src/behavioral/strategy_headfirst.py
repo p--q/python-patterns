@@ -1,6 +1,8 @@
 #!~/anaconda3/bin/python
 # -*- coding: utf-8 -*-
 class FlyBehavior:
+    def __init__(self,name):
+        self.name = name
     def flyNoWay(self):
         print(self.name + " can't fly")
     def flyWithWings(self):
@@ -16,42 +18,47 @@ class QuackBehavior:
         print("Squeak")
     def fakeQuack(self):
         print("Qwak")
-class Duck(FlyBehavior,QuackBehavior): 
+class Duck: 
     def swim(self):
         print("All ducks float, even decoys!") 
 class DecoyDuck(Duck):
     def __init__(self,name):
-        self.name = name
-        self.performFly = self.flyNoWay 
-        self.performQuack = self.muteQuack
+        self.flyBehavior = FlyBehavior(name)
+        self.quackBehavior = QuackBehavior()
+        self.performFly = self.flyBehavior.flyWithWings
+        self.performQuack = self.quackBehavior.quack        
     def display(self):
         print(self.name + " is a duck Decoy")
 class MallardDuck(Duck):
     def __init__(self,name):
-        self.name = name
-        self.performFly = self.flyWithWings
-        self.performQuack = self.quack
+        self.flyBehavior = FlyBehavior(name)
+        self.quackBehavior = QuackBehavior()
+        self.performFly = self.flyBehavior.flyWithWings
+        self.performQuack = self.quackBehavior.quack
     def display(self):
         print(self.name + " is a real Mallard duck")
 class ModelDuck(Duck):
     def __init__(self,name):
-        self.name = name
-        self.performFly = self.flyNoWay 
-        self.performQuack = self.quack
+        self.flyBehavior = FlyBehavior(name)
+        self.quackBehavior = QuackBehavior()
+        self.performFly = self.flyBehavior.flyNoWay 
+        self.performQuack = self.quackBehavior.quack
     def display(self):
         print(self.name + " is a model duck")
 class RedHeadDuck(Duck):
     def __init__(self,name):
-        self.name = name
-        self.performFly = self.flyWithWings
-        self.performQuack = self.quack
+        self.flyBehavior = FlyBehavior(name)
+        self.quackBehavior = QuackBehavior()
+        self.performFly = self.flyBehavior.flyWithWings
+        self.performQuack = self.quackBehavior.quack
     def display(self):
         print(self.name + " is a real Red Headed duck")     
 class RubberDuck(Duck):
     def __init__(self,name):
-        self.name = name
-        self.performFly = self.flyNoWay 
-        self.performQuack = self.squeak
+        self.flyBehavior = FlyBehavior(name)
+        self.quackBehavior = QuackBehavior()
+        self.performFly = self.flyBehavior.flyNoWay 
+        self.performQuack = self.quackBehavior.squeak
     def display(self):
         print(self.name + " is a rubber duckie")   
 if __name__ == '__main__':
@@ -65,7 +72,7 @@ if __name__ == '__main__':
     decoy.performQuack()
    
     model.performFly()  
-    model.performFly = model.flyRocketPowered  # インスタンスのメソッドを置換。
+    model.performFly = model.flyBehavior.flyRocketPowered  # インスタンスのメソッドを置換。
     model.performFly()
     
     model2 = ModelDuck("model2")
