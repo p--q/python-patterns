@@ -23,6 +23,7 @@ class Duck:
         print("All ducks float, even decoys!") 
 class DecoyDuck(Duck):
     def __init__(self,name):
+        self.name = name
         self.flyBehavior = FlyBehavior(name)
         self.quackBehavior = QuackBehavior()
         self.performFly = self.flyBehavior.flyWithWings
@@ -31,6 +32,7 @@ class DecoyDuck(Duck):
         print(self.name + " is a duck Decoy")
 class MallardDuck(Duck):
     def __init__(self,name):
+        self.name = name
         self.flyBehavior = FlyBehavior(name)
         self.quackBehavior = QuackBehavior()
         self.performFly = self.flyBehavior.flyWithWings
@@ -39,6 +41,7 @@ class MallardDuck(Duck):
         print(self.name + " is a real Mallard duck")
 class ModelDuck(Duck):
     def __init__(self,name):
+        self.name = name
         self.flyBehavior = FlyBehavior(name)
         self.quackBehavior = QuackBehavior()
         self.performFly = self.flyBehavior.flyNoWay 
@@ -47,6 +50,7 @@ class ModelDuck(Duck):
         print(self.name + " is a model duck")
 class RedHeadDuck(Duck):
     def __init__(self,name):
+        self.name = name
         self.flyBehavior = FlyBehavior(name)
         self.quackBehavior = QuackBehavior()
         self.performFly = self.flyBehavior.flyWithWings
@@ -55,6 +59,7 @@ class RedHeadDuck(Duck):
         print(self.name + " is a real Red Headed duck")     
 class RubberDuck(Duck):
     def __init__(self,name):
+        self.name = name
         self.flyBehavior = FlyBehavior(name)
         self.quackBehavior = QuackBehavior()
         self.performFly = self.flyBehavior.flyNoWay 
@@ -77,6 +82,8 @@ if __name__ == '__main__':
     
     model2 = ModelDuck("model2")
     model2.performFly()  # 他のインスタンスのメソッドは置換されない。
+    
+    model2.display()
     
 
     
