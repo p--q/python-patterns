@@ -1,8 +1,8 @@
 #!~/anaconda3/bin/python
 # -*- coding: utf-8 -*-
 class FlyBehavior:
-    def __init__(self,name):
-        self.name = name
+#     def __init__(self,name):
+#         self.name = name
     def flyNoWay(self):
         print(self.name + " can't fly")
     def flyWithWings(self):
@@ -26,7 +26,8 @@ class Duck:
     def swim(self):
         print("All ducks float, even decoys!") 
 class DecoyDuck(Duck):
-    def __init__(self,name):
+    def __init__(self,name,fb):
+        self.name = name
         self.flyBehavior = FlyBehavior(name)
         self.performFly = self.flyBehavior.flyWithWings
         self.performQuack = QuackBehavior.quack        
