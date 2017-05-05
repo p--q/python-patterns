@@ -1,5 +1,6 @@
 #!~/anaconda3/bin/python
 # -*- coding: utf-8 -*-
+import types
 class WeatherData:  # Subject
     def measurementsChanged(self):
         pass
@@ -16,7 +17,6 @@ class WeatherData:  # Subject
         return self.pressure
 class CurrentConditionsDisplay:  # Observer
     def __init__(self,weatherData):
-        import types
         weatherData.mesurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged),weatherData)
     def register(self,f):
         def g(this):
@@ -28,13 +28,14 @@ class CurrentConditionsDisplay:  # Observer
         print("Current conditions: {}F degrees and {}% humidity".format(self.temperature, self.humidity))
 class ForecastDisplay:
     def __init__(self,weatherData):
-        self.weatherData = weatherData
+        weatherData.mesurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged),weatherData)
         self.currentPressure = 29.92
-        # notify
-    def update(self,temperature,humidity,pressure):
-        self.lastpressure = self.currentPressure
-        self.currentPressure = pressure
-        self.display()
+    def register(self,f):
+        def g(this):
+            self.lastPressure = self.currentPressure
+            self.currentPressure = this.pressure
+            self.display()
+        return g        
     def display(self):
         print("Forecast: ");
         if self.currentPressure > self.lastPressure:
@@ -45,30 +46,32 @@ class ForecastDisplay:
             print("Watch out for cooler, rainy weather")
 class StatisticsDisplay:
     def __init__(self,weatherData):
-        self.weatherData = weatherData
+        weatherData.mesurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged),weatherData)
         self.maxTemp = 0.0
         self.minTemp = 200
         self.tempSum = 0.0
         self.numReadings = 0
-        # notify           
-    def update(self, temp, humidity, pressure):
-        self.tempSum += temp
-        self.numReadings += 1
-        if self.temp > self.maxTemp:
-            self.maxTemp = self.temp
-        if self.temp < self.minTemp:
-            self.minTemp = self.temp
-        self.display()
+    def register(self,f):
+        def g(this):
+            self.tempSum += this.temperature
+            self.numReadings += 1
+            if this.temperature > self.maxTemp:
+                self.maxTemp = this.temperature
+            if this.temperature < self.minTemp:
+                self.minTemp = this.temperature
+            self.display()
+        return g          
     def display(self):
         print("Avg/Max/Min temperature = {}/{}/{}".format(self.tempSum/self.numReadings, self.maxTemp, self.minTemp))
 class HeatIndexDisplay:
     def __init__(self,weatherData):
-        self.weatherData = weatherData
+        weatherData.mesurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged),weatherData)
         self.heatIndex = 0.0
-        # notify
-    def update(self,t,rh,pressure):
-        self.heatIndex = self.computeHeatIndex(t,rh)
-        self.display()
+    def register(self,f):
+        def g(this):
+            self.heatIndex = self.computeHeatIndex(this.temperature,this.humidity)
+            self.display()
+        return g           
     def computeHeatIndex(self,t,rh):
         return (16.923 + (0.185212 * t) + (5.37941 * rh) - (0.100254 * t * rh) + (0.00941695 * (t * t)) + (0.00728898 * (rh * rh)) + (0.000345372 * (t * t * rh)) - (0.000814971 * (t * rh * rh)) + (0.0000102102 * (t * t * rh * rh)) - (0.000038646 * (t * t * t)) + (0.0000291583 * (rh * rh * rh)) + (0.00000142721 * (t * t * t * rh)) + (0.000000197483 * (t * rh * rh * rh)) - (0.0000000218429 * (t * t * t * rh * rh)) + 0.000000000843296 * (t * t * rh * rh * rh)) - (0.0000000000481975 * (t * t * t * rh * rh * rh))
     def display(self):
