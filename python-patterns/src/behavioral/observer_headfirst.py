@@ -16,9 +16,11 @@ class WeatherData:  # Subject
         return self.pressure
 class CurrentConditionsDisplay:  # Observer
     def __init__(self,weatherData):
-        WeatherData.mesurementsChanged = self.register(WeatherData.mesurementsChanged)
+#         WeatherData.mesurementsChanged = self.register(WeatherData.mesurementsChanged)
 
-#         weatherData.mesurementsChanged = self.register(weatherData.mesurementsChanged)
+        self.weatherData = weatherData
+        import types
+        self.weatherData.mesurementsChanged = types.MethodType(self.register(self.weatherData.mesurementsChanged),self.weatherData)
 
     def register(self,f):
         def g(this):
@@ -62,7 +64,7 @@ class StatisticsDisplay:
             self.minTemp = self.temp
         self.display()
     def display(self):
-        print("Avg/Max/Min temperature = " + (self.tempSum / self.numReadings) + "/" + self.maxTemp + "/" + self.minTemp)
+        print("Avg/Max/Min temperature = {}/{}/{}".format(self.tempSum/self.numReadings, self.maxTemp, self.minTemp))
 class HeatIndexDisplay:
     def __init__(self,weatherData):
         self.weatherData = weatherData
@@ -74,7 +76,7 @@ class HeatIndexDisplay:
     def computeHeatIndex(self,t,rh):
         return (16.923 + (0.185212 * t) + (5.37941 * rh) - (0.100254 * t * rh) + (0.00941695 * (t * t)) + (0.00728898 * (rh * rh)) + (0.000345372 * (t * t * rh)) - (0.000814971 * (t * rh * rh)) + (0.0000102102 * (t * t * rh * rh)) - (0.000038646 * (t * t * t)) + (0.0000291583 * (rh * rh * rh)) + (0.00000142721 * (t * t * t * rh)) + (0.000000197483 * (t * rh * rh * rh)) - (0.0000000218429 * (t * t * t * rh * rh)) + 0.000000000843296 * (t * t * rh * rh * rh)) - (0.0000000000481975 * (t * t * t * rh * rh * rh))
     def display(self):
-        print("Heat index is " + self.heatIndex)      
+        print("Heat index is {}".format(self.heatIndex))      
 if __name__ == '__main__':
     weatherData = WeatherData()
     currentDisplay = CurrentConditionsDisplay(weatherData)
