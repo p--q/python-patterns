@@ -1,7 +1,7 @@
 #!~/anaconda3/bin/python
 # -*- coding: utf-8 -*-
 class WeatherData:  # Subject
-    def mesurementsChanged(self):
+    def measurementsChanged(self):
         pass
     def setMeasurements(self,temperature,humidity,pressure):  # 測定値を取得する。
         self.temperature = temperature
@@ -16,12 +16,8 @@ class WeatherData:  # Subject
         return self.pressure
 class CurrentConditionsDisplay:  # Observer
     def __init__(self,weatherData):
-#         WeatherData.mesurementsChanged = self.register(WeatherData.mesurementsChanged)
-
-        self.weatherData = weatherData
         import types
-        self.weatherData.mesurementsChanged = types.MethodType(self.register(self.weatherData.mesurementsChanged),self.weatherData)
-
+        weatherData.mesurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged),weatherData)
     def register(self,f):
         def g(this):
             self.temperature = this.temperature
