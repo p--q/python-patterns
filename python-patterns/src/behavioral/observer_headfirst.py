@@ -26,8 +26,6 @@ class WeatherData:  # Subject
     def getPressure(self):
         return self.pressure
 class CurrentConditionsDisplay:  # Observer
-    def __init__(self,weatherData):
-        weatherData.registerObserver(self)
     def update(self,subject):
         self.temperature = subject.temperature
         self.humidity = subject.humidity
@@ -35,8 +33,7 @@ class CurrentConditionsDisplay:  # Observer
     def display(self):
         print("Current conditions: {}F degrees and {}% humidity".format(self.temperature, self.humidity))
 class ForecastDisplay:  # Observer
-    def __init__(self,weatherData):
-        weatherData.registerObserver(self)
+    def __init__(self):
         self.currentPressure = 29.92   
     def update(self,subject):
         self.lastPressure = self.currentPressure
@@ -51,8 +48,7 @@ class ForecastDisplay:  # Observer
         elif self.currentPressure < self.lastPressure:
             print("Watch out for cooler, rainy weather")
 class StatisticsDisplay:  # Observer
-    def __init__(self,weatherData):
-        weatherData.registerObserver(self)
+    def __init__(self):
         self.maxTemp = 0.0
         self.minTemp = 200
         self.tempSum = 0.0
@@ -68,8 +64,7 @@ class StatisticsDisplay:  # Observer
     def display(self):
         print("Avg/Max/Min temperature = {}/{}/{}".format(self.tempSum/self.numReadings, self.maxTemp, self.minTemp))
 class HeatIndexDisplay:  # Observer
-    def __init__(self,weatherData):
-        weatherData.registerObserver(self)
+    def __init__(self):
         self.heatIndex = 0.0     
     def update(self,subject):
         self.heatIndex = self.computeHeatIndex(subject.temperature,subject.humidity)
@@ -80,10 +75,16 @@ class HeatIndexDisplay:  # Observer
         print("Heat index is {}".format(self.heatIndex))    
 if __name__ == '__main__':
     weatherData = WeatherData()  # Subject 
-    CurrentConditionsDisplay(weatherData)  # Observer
-    StatisticsDisplay(weatherData)  # Observer
-    ForecastDisplay(weatherData)  # Observer
-    HeatIndexDisplay(weatherData)  # Observer 
+
+    currentDisplay = CurrentConditionsDisplay()  # Observer
+    statisticsDisplay = StatisticsDisplay()  # Observer
+    forecastDisplay = ForecastDisplay()  # Observer
+    heatIndexDisplay = HeatIndexDisplay()  # Observer 
+
+    weatherData.registerObserver(currentDisplay)  # Register an Observer
+    weatherData.registerObserver(statisticsDisplay)
+    weatherData.registerObserver(forecastDisplay)
+    weatherData.registerObserver(heatIndexDisplay)   
 
     # Input test data
     weatherData.setMeasurements(80, 65, 30.4)
