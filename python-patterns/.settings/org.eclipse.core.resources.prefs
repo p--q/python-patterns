@@ -3,6 +3,7 @@ encoding//src/behavioral/catalog.py=utf-8
 encoding//src/behavioral/iterator.py=utf-8
 encoding//src/behavioral/memento.py=utf-8
 encoding//src/behavioral/observer.py=utf-8
+encoding//src/behavioral/observer_headfirst.py=utf-8
 encoding//src/behavioral/publish_subscribe.py=utf-8
 encoding//src/behavioral/strategy.py=utf-8
 encoding//src/behavioral/strategy_headfirst.py=utf-8
