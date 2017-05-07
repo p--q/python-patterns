@@ -1,5 +1,6 @@
 eclipse.preferences.version=1
 encoding//src/behavioral/catalog.py=utf-8
+encoding//src/behavioral/command.py=utf-8
 encoding//src/behavioral/iterator.py=utf-8
 encoding//src/behavioral/memento.py=utf-8
 encoding//src/behavioral/observer.py=utf-8
