@@ -22,6 +22,8 @@ class CurrentConditionsDisplay:  # Observer
 #     def observe(self,bound_method):
 #         bound_method.__self__.measurementsChanged = types.MethodType(self.register(bound_method), bound_method.__self__)   
     def register(self,f):
+        
+        
         def g(this):
             f()
             return self.update(this)
@@ -102,7 +104,21 @@ class HeatIndexDisplay:
         return (16.923 + (0.185212 * t) + (5.37941 * rh) - (0.100254 * t * rh) + (0.00941695 * (t * t)) + (0.00728898 * (rh * rh)) + (0.000345372 * (t * t * rh)) - (0.000814971 * (t * rh * rh)) + (0.0000102102 * (t * t * rh * rh)) - (0.000038646 * (t * t * t)) + (0.0000291583 * (rh * rh * rh)) + (0.00000142721 * (t * t * t * rh)) + (0.000000197483 * (t * rh * rh * rh)) - (0.0000000218429 * (t * t * t * rh * rh)) + 0.000000000843296 * (t * t * rh * rh * rh)) - (0.0000000000481975 * (t * t * t * rh * rh * rh))
     def display(self):
         print("Heat index is {}".format(self.heatIndex))      
+
+
 if __name__ == '__main__':
+    
+#     def register(self):
+#         callbacks = list()
+#         def g(this):
+#             callbacks.append(self.update(this))
+#             return lambda callbacks: [fn() for fn in callbacks]
+#         return g    
+
+
+
+
+
     weatherData = WeatherData()
 #     currentDisplay = CurrentConditionsDisplay(weatherData)
 #     statisticsDisplay = StatisticsDisplay(weatherData)
@@ -121,8 +137,12 @@ if __name__ == '__main__':
     forecastDisplay.observe(weatherData)
     heatIndexDisplay.observe(weatherData)
     
-    weatherData = WeatherData()
-    currentDisplay.observe(weatherData)
+#     weatherData = WeatherData()
+#     currentDisplay.observe(weatherData)
+    
+    
+#     forecastDisplay.update = types.MethodType(lambda :pass, forecastDisplay)
+    
     
     
     weatherData.setMeasurements(80, 65, 30.4)

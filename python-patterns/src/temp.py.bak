@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-
 class Wrapper(object):
     def __init__(self,wrapped,*callbacks):
         self.wrapped = wrapped
@@ -14,7 +13,7 @@ class Wrapper(object):
             return res
         def wrap(*args,**kwargs):
             for c in self.callbacks:
-                c(self.wrapped,f,*args,**kwargs)
+                c(self.wrapped,*args,**kwargs)
             return res(*args,**kwargs)
         return wrap
 
@@ -26,7 +25,7 @@ called = []
 #this is the list
 a = []
 #and this is the wrapped list
-w = Wrapper(a,lambda f,v,ign: called.append((f,v)) )
+w = Wrapper(a,lambda f,v: called.append((f,v)) )
 #I append an element to the wrapper
 w.append(1)
 #and I can see that it modify the original list
@@ -36,6 +35,71 @@ print w
 #and we can see which function we called and which were the parameters
 print called
 
+
+
+
+
+
+# class User:
+#     _persist_methods = ['get', 'save', 'delete']
+# 
+#     def __init__(self, persister):
+#         self._persister = persister
+# 
+#     def __getattr__(self, attribute):
+#         if attribute in self._persist_methods:
+#             return getattr(self._persister, attribute)
+# 
+# 
+# duck = User("get")
+# 
+# duck.get
+
+# def hello():
+#     return "hello world"
+# 
+# 
+# class Wrapper:
+#     def __init__(self,wrapped,*callbacks):
+#         self.wrapped = wrapped
+#         self.callbacks = callbacks
+# 
+#     def __getattr__(self,name):
+#         res = self.wrapped.__getattribute__(name)
+#         if not callable(res):
+#             return res
+#         def wrap(*args,**kwargs):
+#             for c in self.callbacks:
+#                 c(self.wrapped,*args,**kwargs)
+#             return res(*args,**kwargs)
+#         return wrap
+# 
+#     def __str__(self):
+#         return self.wrapped.__str__()
+# 
+# #in this example I will keep a record of each call performed on a list
+# called = []
+# #this is the list
+# a = []
+# #and this is the wrapped list
+# w = Wrapper(a,lambda f,v: called.append((f,v)) )
+# #I append an element to the wrapper
+# w.append(1)
+# #and I can see that it modify the original list
+# print(a)
+# #the print of the wrapped is well behaved, having defined the __str__ function
+# print(w)
+# #and we can see which function we called and which were the parameters
+# print(called)
+
+
+# w.append(hello)
+# #and I can see that it modify the original list
+# print(a)
+# #the print of the wrapped is well behaved, having defined the __str__ function
+# print(w)
+# #and we can see which function we called and which were the parameters
+# print(called)
 
 
 
