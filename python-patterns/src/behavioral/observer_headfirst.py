@@ -1,6 +1,6 @@
 #!~/anaconda3/bin/python
 # -*- coding: utf-8 -*-
-import types
+
 class WeatherData:  # Subject
     def measurementsChanged(self):
         pass
@@ -64,29 +64,53 @@ class HeatIndexDisplay:
         return (16.923 + (0.185212 * t) + (5.37941 * rh) - (0.100254 * t * rh) + (0.00941695 * (t * t)) + (0.00728898 * (rh * rh)) + (0.000345372 * (t * t * rh)) - (0.000814971 * (t * rh * rh)) + (0.0000102102 * (t * t * rh * rh)) - (0.000038646 * (t * t * t)) + (0.0000291583 * (rh * rh * rh)) + (0.00000142721 * (t * t * t * rh)) + (0.000000197483 * (t * rh * rh * rh)) - (0.0000000218429 * (t * t * t * rh * rh)) + 0.000000000843296 * (t * t * rh * rh * rh)) - (0.0000000000481975 * (t * t * t * rh * rh * rh))
     def display(self):
         print("Heat index is {}".format(self.heatIndex))    
-        
+
+import types        
 class Observe:
-    def __init__(self,subject):
-        self._updates = list()
-        
-#         self.event = event
+    
+    def __init__(self,subject,subject_m):
+        self._observer_ms = list()
         self.subject = subject
-        
-    def register(self,observer):
-        if observer not in self._updates:
-            self._updates.append(observer)
-    def _register(self,observer,f):
+        self.subject_m = subject_m
+    def register(self, observer_m):
+        if observer_m not in self._observer_ms:
+            self._observer_ms.append(observer_m)
+        self.observe()
+            
+    def _register(self):
         def g(this):
-            f()
-            return observer.update(this)
+#             self.observers.append(types.MethodType(self.update,this))
+
+
+            return self.execute(this)        
+            
+
+#             f()
+#             return observer.update(this)
         return g
-    def remove(self,observer):
-        if observer in self._updates:
-            self._updates.remove(observer)
-    def observe(self):
-        for observer in self._updates:
-            weatherData.measurementsChanged = types.MethodType(self._register(observer, weatherData.measurementsChanged),self.subject)          
+    def remove(self, observer_m):
+        if observer_m in self._observer_ms:
+            self._observer_ms.remove(observer_m)
+    def observe(self):  # Subjectのメソッドをself._registerに置換する。
+        weatherData.measurementsChanged = types.MethodType(self._register(),self.subject)  # 置換できる          
         
+#         self.subject_m = types.MethodType(self._register(), self.subject)  # 置換できない。  
+        
+#         
+#         for observer in self._updates:
+#             weatherData.measurementsChanged = types.MethodType(self._register(observer, weatherData.measurementsChanged),self.subject)          
+        
+
+#     def register(self,f):
+#         def g(this):
+#             self.observers.append(types.MethodType(self.update,this))
+#             return self.execute
+#         return g
+    def execute(self,this):
+        for observer_m in self._observer_ms:
+            observer_m(this)
+
+
         
           
 if __name__ == '__main__':
@@ -104,11 +128,11 @@ if __name__ == '__main__':
                 
         
         
-    obs = Observe(weatherData)  
-    obs.register(currentDisplay)
-    obs.register(statisticsDisplay)
-    obs.register(forecastDisplay)
-    obs.register(heatIndexDisplay)   
+    obs = Observe(weatherData,weatherData.measurementsChanged)  
+    obs.register(currentDisplay.update)
+    obs.register(statisticsDisplay.update)
+    obs.register(forecastDisplay.update)
+    obs.register(heatIndexDisplay.update)   
     
 #     obs.register(statisticsDisplay)
 #     obs.register(forecastDisplay)
