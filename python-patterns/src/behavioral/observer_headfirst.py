@@ -65,8 +65,7 @@ class HeatIndexDisplay:
     def display(self):
         print("Heat index is {}".format(self.heatIndex))    
 
-def hello():
-    print("hello")
+
 
 
 import types        
@@ -74,7 +73,8 @@ class Observe:
     def __init__(self,subject,subject_m):
         self._observer_ms = list()
         self.subject = subject
-        self.subject_m = subject_m
+        self.subject_m_name = subject_m
+        self.subject_m = getattr(self.subject,self.subject_m_name) 
     def register(self, observer_m):
         if observer_m not in self._observer_ms:
             self._observer_ms.append(observer_m)
@@ -92,13 +92,16 @@ class Observe:
 #         
 #         weatherData.measurementsChanged()
         
-        "これがうまくいかない。変数にしたい。"
+#         
 #         weatherData.measurementsChanged = types.MethodType(self._register(self.subject_m), self.subject)  # 置換できる          
         
-        setattr(self.subject,"measurementsChanged", types.MethodType(self._register(self.subject_m), self.subject))
+#         setattr(self.subject, self.subject_m_name, types.MethodType(self._register(getattr(self.subject,self.subject_m)), self.subject))
+        
+        setattr(self.subject, self.subject_m_name, types.MethodType(self._register(self.subject_m), self.subject))
         
 #         self.subject_m = types.MethodType(self._register(), self.subject)  # 置換できない。これは変数self.sbuject_mを代入しなおしているだけの意味。
     def execute(self,this,f):
+#         self.observe()   
         f()
         for observer_m in self._observer_ms:
             observer_m(this)
@@ -111,7 +114,7 @@ if __name__ == '__main__':
     forecastDisplay = ForecastDisplay()
     heatIndexDisplay = HeatIndexDisplay()  
                 
-    obs = Observe(weatherData,weatherData.measurementsChanged)  
+    obs = Observe(weatherData,"measurementsChanged")  
     obs.register(currentDisplay.update)
     obs.register(statisticsDisplay.update)
     obs.register(forecastDisplay.update)
