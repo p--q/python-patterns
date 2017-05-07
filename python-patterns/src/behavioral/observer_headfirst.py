@@ -108,7 +108,7 @@ class Observe:  # Observer Broker
         '''
         if observer_m in self._observer_ms:
             self._observer_ms.remove(observer_m)
-    def _observe(self):  # Subjectのメソッドをself._registerに置換する。
+    def _observe(self):  # Subjectのメソッドをself._decoratorでself._executeに置換する。
         '''
         Replace the Subject method
         :returns: None
