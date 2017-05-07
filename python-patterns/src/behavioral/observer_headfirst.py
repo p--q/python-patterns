@@ -3,8 +3,8 @@
 
 class WeatherData:  # Subject
     def measurementsChanged(self):
-        pass
-#         print("mesurementsChanged {}".format(self.temperature))
+#         pass
+        print("mesurementsChanged {}".format(self.temperature))
     def setMeasurements(self,temperature,humidity,pressure):  # 測定値を取得する。
         self.temperature = temperature
         self.humidity = humidity
@@ -65,9 +65,12 @@ class HeatIndexDisplay:
     def display(self):
         print("Heat index is {}".format(self.heatIndex))    
 
+def hello():
+    print("hello")
+
+
 import types        
 class Observe:
-    
     def __init__(self,subject,subject_m):
         self._observer_ms = list()
         self.subject = subject
@@ -75,85 +78,44 @@ class Observe:
     def register(self, observer_m):
         if observer_m not in self._observer_ms:
             self._observer_ms.append(observer_m)
-        self.observe()
-            
-    def _register(self):
+        self.observe()     
+    def _register(self,f):
         def g(this):
-#             self.observers.append(types.MethodType(self.update,this))
-
-
-            return self.execute(this)        
-            
-
-#             f()
-#             return observer.update(this)
+            return self.execute(this,f)        
         return g
     def remove(self, observer_m):
         if observer_m in self._observer_ms:
             self._observer_ms.remove(observer_m)
     def observe(self):  # Subjectのメソッドをself._registerに置換する。
-        weatherData.measurementsChanged = types.MethodType(self._register(),self.subject)  # 置換できる          
         
-#         self.subject_m = types.MethodType(self._register(), self.subject)  # 置換できない。  
-        
+#         self.subject_m = hello()
 #         
-#         for observer in self._updates:
-#             weatherData.measurementsChanged = types.MethodType(self._register(observer, weatherData.measurementsChanged),self.subject)          
+#         weatherData.measurementsChanged()
         
-
-#     def register(self,f):
-#         def g(this):
-#             self.observers.append(types.MethodType(self.update,this))
-#             return self.execute
-#         return g
-    def execute(self,this):
+        "これがうまくいかない。変数にしたい。"
+#         weatherData.measurementsChanged = types.MethodType(self._register(self.subject_m), self.subject)  # 置換できる          
+        
+        setattr(self.subject,"measurementsChanged", types.MethodType(self._register(self.subject_m), self.subject))
+        
+#         self.subject_m = types.MethodType(self._register(), self.subject)  # 置換できない。これは変数self.sbuject_mを代入しなおしているだけの意味。
+    def execute(self,this,f):
+        f()
         for observer_m in self._observer_ms:
             observer_m(this)
-
-
-        
-          
+            
 if __name__ == '__main__':
     weatherData = WeatherData()
 
-
- 
-            
-                      
-        
     currentDisplay = CurrentConditionsDisplay()
     statisticsDisplay = StatisticsDisplay()
     forecastDisplay = ForecastDisplay()
     heatIndexDisplay = HeatIndexDisplay()  
                 
-        
-        
     obs = Observe(weatherData,weatherData.measurementsChanged)  
     obs.register(currentDisplay.update)
     obs.register(statisticsDisplay.update)
     obs.register(forecastDisplay.update)
     obs.register(heatIndexDisplay.update)   
-    
-#     obs.register(statisticsDisplay)
-#     obs.register(forecastDisplay)
-#     obs.register(heatIndexDisplay)
-#     
-    
-    obs.observe()
-              
-#     for observer in [CurrentConditionsDisplay(),StatisticsDisplay(),ForecastDisplay(),HeatIndexDisplay()]:
-#         weatherData.measurementsChanged = types.MethodType(obs.register(observer,weatherData.measurementsChanged),weatherData)            
-            
-    
-#     def register(self,f):
-#         def g(this):
-#             f()
-#             return self.update(this)
-#         return g
-#      
-#     for observer in [CurrentConditionsDisplay(),StatisticsDisplay(),ForecastDisplay(),HeatIndexDisplay()]:
-#         weatherData.measurementsChanged = types.MethodType(register(observer,weatherData.measurementsChanged),weatherData)
-    
     
     weatherData.setMeasurements(80, 65, 30.4)
     print()
