@@ -63,20 +63,72 @@ class HeatIndexDisplay:
     def computeHeatIndex(self,t,rh):
         return (16.923 + (0.185212 * t) + (5.37941 * rh) - (0.100254 * t * rh) + (0.00941695 * (t * t)) + (0.00728898 * (rh * rh)) + (0.000345372 * (t * t * rh)) - (0.000814971 * (t * rh * rh)) + (0.0000102102 * (t * t * rh * rh)) - (0.000038646 * (t * t * t)) + (0.0000291583 * (rh * rh * rh)) + (0.00000142721 * (t * t * t * rh)) + (0.000000197483 * (t * rh * rh * rh)) - (0.0000000218429 * (t * t * t * rh * rh)) + 0.000000000843296 * (t * t * rh * rh * rh)) - (0.0000000000481975 * (t * t * t * rh * rh * rh))
     def display(self):
-        print("Heat index is {}".format(self.heatIndex))      
+        print("Heat index is {}".format(self.heatIndex))    
+        
+class Observe:
+    def __init__(self,subject):
+        self._updates = list()
+        
+#         self.event = event
+        self.subject = subject
+        
+    def register(self,observer):
+        if observer not in self._updates:
+            self._updates.append(observer)
+    def _register(self,observer,f):
+        def g(this):
+            f()
+            return observer.update(this)
+        return g
+    def remove(self,observer):
+        if observer in self._updates:
+            self._updates.remove(observer)
+    def observe(self):
+        for observer in self._updates:
+            weatherData.measurementsChanged = types.MethodType(self._register(observer, weatherData.measurementsChanged),self.subject)          
+        
+        
+          
 if __name__ == '__main__':
     weatherData = WeatherData()
 
+
+ 
+            
+                      
+        
+    currentDisplay = CurrentConditionsDisplay()
+    statisticsDisplay = StatisticsDisplay()
+    forecastDisplay = ForecastDisplay()
+    heatIndexDisplay = HeatIndexDisplay()  
+                
+        
+        
+    obs = Observe(weatherData)  
+    obs.register(currentDisplay)
+    obs.register(statisticsDisplay)
+    obs.register(forecastDisplay)
+    obs.register(heatIndexDisplay)   
     
-    def register(self,f):
-        def g(this):
-            f()
-            return self.update(this)
-        return g
-     
-    subject = weatherData
-    for observer in [CurrentConditionsDisplay(),StatisticsDisplay(),ForecastDisplay(),HeatIndexDisplay()]:
-        subject.measurementsChanged = types.MethodType(register(observer,subject.measurementsChanged),subject)
+#     obs.register(statisticsDisplay)
+#     obs.register(forecastDisplay)
+#     obs.register(heatIndexDisplay)
+#     
+    
+    obs.observe()
+              
+#     for observer in [CurrentConditionsDisplay(),StatisticsDisplay(),ForecastDisplay(),HeatIndexDisplay()]:
+#         weatherData.measurementsChanged = types.MethodType(obs.register(observer,weatherData.measurementsChanged),weatherData)            
+            
+    
+#     def register(self,f):
+#         def g(this):
+#             f()
+#             return self.update(this)
+#         return g
+#      
+#     for observer in [CurrentConditionsDisplay(),StatisticsDisplay(),ForecastDisplay(),HeatIndexDisplay()]:
+#         weatherData.measurementsChanged = types.MethodType(register(observer,weatherData.measurementsChanged),weatherData)
     
     
     weatherData.setMeasurements(80, 65, 30.4)
