@@ -87,7 +87,7 @@ class Observe:  # Observer Broker
         if observer_m not in self._observer_ms:
             self._observer_ms.append(observer_m)
         self._observe()  # Replace the Subject method    
-    def _register(self,f):
+    def _decorator(self,f):
         '''
         Decorator of the Subject method
         :param f: the Subject method
@@ -114,7 +114,7 @@ class Observe:  # Observer Broker
         :returns: None
         :rtype: None
         '''
-        setattr(self.subject, self.subject_m_name, types.MethodType(self._register(self.subject_m), self.subject))
+        setattr(self.subject, self.subject_m_name, types.MethodType(self._decorator(self.subject_m), self.subject))
     def _execute(self,this,f,*args):  # Subjectのメソッドと入れ替わる関数。*argsは元のSubjectのメソッドの引数。
         '''
         Function to be replaced with the Subject method
