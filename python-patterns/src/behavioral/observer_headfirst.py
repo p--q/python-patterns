@@ -1,15 +1,10 @@
 #!~/anaconda3/bin/python
 # -*- coding: utf-8 -*-
-
 class WeatherData:  # Subject
-    def measurementsChanged(self):
-#         pass
-        print("mesurementsChanged {}".format(self.temperature))
     def setMeasurements(self,temperature,humidity,pressure):  # 測定値を取得する。
         self.temperature = temperature
         self.humidity = humidity
         self.pressure = pressure
-        self.measurementsChanged()  # 測定値が変化したことを伝える。
     def getTemperature(self):
         return self.temperature
     def getHumidity(self):
@@ -23,7 +18,7 @@ class CurrentConditionsDisplay:  # Observer
         self.display()
     def display(self):
         print("Current conditions: {}F degrees and {}% humidity".format(self.temperature, self.humidity))
-class ForecastDisplay:
+class ForecastDisplay:  # Observer
     def __init__(self):
         self.currentPressure = 29.92   
     def update(self,this):
@@ -38,7 +33,7 @@ class ForecastDisplay:
             print("More of the same");
         elif self.currentPressure < self.lastPressure:
             print("Watch out for cooler, rainy weather")
-class StatisticsDisplay:
+class StatisticsDisplay:  # Observer
     def __init__(self):
         self.maxTemp = 0.0
         self.minTemp = 200
@@ -54,7 +49,7 @@ class StatisticsDisplay:
         self.display()
     def display(self):
         print("Avg/Max/Min temperature = {}/{}/{}".format(self.tempSum/self.numReadings, self.maxTemp, self.minTemp))
-class HeatIndexDisplay:
+class HeatIndexDisplay:  # Observer
     def __init__(self):
         self.heatIndex = 0.0     
     def update(self,this):
@@ -64,242 +59,94 @@ class HeatIndexDisplay:
         return (16.923 + (0.185212 * t) + (5.37941 * rh) - (0.100254 * t * rh) + (0.00941695 * (t * t)) + (0.00728898 * (rh * rh)) + (0.000345372 * (t * t * rh)) - (0.000814971 * (t * rh * rh)) + (0.0000102102 * (t * t * rh * rh)) - (0.000038646 * (t * t * t)) + (0.0000291583 * (rh * rh * rh)) + (0.00000142721 * (t * t * t * rh)) + (0.000000197483 * (t * rh * rh * rh)) - (0.0000000218429 * (t * t * t * rh * rh)) + 0.000000000843296 * (t * t * rh * rh * rh)) - (0.0000000000481975 * (t * t * t * rh * rh * rh))
     def display(self):
         print("Heat index is {}".format(self.heatIndex))    
-
-
-
-
+        
 import types        
-class Observe:
-    def __init__(self,subject,subject_m):
-        self._observer_ms = list()
-        self.subject = subject
-        self.subject_m_name = subject_m
-        self.subject_m = getattr(self.subject,self.subject_m_name) 
+class Observe:  # Observer Broker
+    def __init__(self,subject,subject_m_name):
+        '''
+        the Class intermediating Observer methods and a Subject method
+        :param subject: a Subject instance
+        :type subject: Object
+        :param subject_m_name: the name of a Subject method (the observed method)
+        :type subject_m_name: str
+        :returns: Observer Broker instance
+        :rtype: Object
+        '''
+        self._observer_ms = list()  # the list of Observer methods
+        self.subject = subject  # the instance of the Subject
+        self.subject_m_name = subject_m_name  # the name of the Subject method
+        self.subject_m = getattr(self.subject, self.subject_m_name)  # the method object of the Subject method
     def register(self, observer_m):
+        '''
+        Register a observer method
+        :param observer_m: Observer method
+        :type observer_m: Method Object
+        :returns: None
+        :rtype: None
+        '''
         if observer_m not in self._observer_ms:
             self._observer_ms.append(observer_m)
-        self.observe()     
+        self._observe()  # Replace the Subject method    
     def _register(self,f):
-        def g(this):
-            return self.execute(this,f)        
+        '''
+        Decorator of the Subject method
+        :param f: the Subject method
+        :type f: Method Object
+        :returns: Function to be replaced with the Subject method
+        :rtype: Function Object
+        '''
+        def g(this,*args):
+            return self._execute(this,f,*args)        
         return g
     def remove(self, observer_m):
+        '''
+        Remove a observer method
+        :param observer_m: Observer method
+        :type observer_m: Method Object
+        :returns: None
+        :rtype: None
+        '''
         if observer_m in self._observer_ms:
             self._observer_ms.remove(observer_m)
-    def observe(self):  # Subjectのメソッドをself._registerに置換する。
-        
-#         self.subject_m = hello()
-#         
-#         weatherData.measurementsChanged()
-        
-#         
-#         weatherData.measurementsChanged = types.MethodType(self._register(self.subject_m), self.subject)  # 置換できる          
-        
-#         setattr(self.subject, self.subject_m_name, types.MethodType(self._register(getattr(self.subject,self.subject_m)), self.subject))
-        
+    def _observe(self):  # Subjectのメソッドをself._registerに置換する。
+        '''
+        Replace the Subject method
+        :returns: None
+        :rtype: None
+        '''
         setattr(self.subject, self.subject_m_name, types.MethodType(self._register(self.subject_m), self.subject))
-        
-#         self.subject_m = types.MethodType(self._register(), self.subject)  # 置換できない。これは変数self.sbuject_mを代入しなおしているだけの意味。
-    def execute(self,this,f):
-#         self.observe()   
-        f()
-        for observer_m in self._observer_ms:
-            observer_m(this)
-            
+    def _execute(self,this,f,*args):  # Subjectのメソッドと入れ替わる関数。*argsは元のSubjectのメソッドの引数。
+        '''
+        Function to be replaced with the Subject method
+        :param this: Subject
+        :type this: Object
+        :param f: the original Subject method
+        :type f:  Method Object
+        :returns: None
+        :rtype: None
+        '''
+        f(*args)  # 置換する前のSubjectのメソッドをまず実行。
+        for observer_m in self._observer_ms:  # Observerのリストにあるメソッドをすべて実行する。
+            observer_m(this)    
+                    
 if __name__ == '__main__':
-    weatherData = WeatherData()
+    weatherData = WeatherData()  # Subject 
 
-    currentDisplay = CurrentConditionsDisplay()
-    statisticsDisplay = StatisticsDisplay()
-    forecastDisplay = ForecastDisplay()
-    heatIndexDisplay = HeatIndexDisplay()  
-                
-    obs = Observe(weatherData,"measurementsChanged")  
-    obs.register(currentDisplay.update)
-    obs.register(statisticsDisplay.update)
+    currentDisplay = CurrentConditionsDisplay()  # Observer
+    statisticsDisplay = StatisticsDisplay()  # Observer
+    forecastDisplay = ForecastDisplay()  # Observer
+    heatIndexDisplay = HeatIndexDisplay()  # Observer 
+
+    obs = Observe(weatherData,"setMeasurements")  # the Observed method
+
+    obs.register(currentDisplay.update)  # Register an Observer method
+    obs.register(statisticsDisplay.update)  # removeする予定がなければ、インスタンスを変数で保持しておく必要はない。登録順に実行される。
     obs.register(forecastDisplay.update)
     obs.register(heatIndexDisplay.update)   
     
+    # Input test data
     weatherData.setMeasurements(80, 65, 30.4)
     print()
     weatherData.setMeasurements(82, 70, 29.2)
     print()
     weatherData.setMeasurements(78, 90, 29.2)
-    
-
-
-
-
-
-
-
-
-
-
-# import types
-# class WeatherData:  # Subject
-#     def measurementsChanged(self):
-#         pass
-#     def setMeasurements(self,temperature,humidity,pressure):  # 測定値を取得する。
-#         self.temperature = temperature
-#         self.humidity = humidity
-#         self.pressure = pressure
-#         self.measurementsChanged()  # 測定値が変化したことを伝える。
-#     def getTemperature(self):
-#         return self.temperature
-#     def getHumidity(self):
-#         return self.humidity
-#     def getPressure(self):
-#         return self.pressure
-#     
-# class Observe:
-#     def __init__(self):
-#         self.updates = list()
-#     def register(self,f):
-#         def g(this):
-#             self.observers.append(types.MethodType(self.update,this))
-#             return self.execute
-#         return g
-#     def execute(self):
-#         for fn in self.updates:
-#             fn()
-#     def remove(self):
-#         pass
-#     
-#     
-# class CurrentConditionsDisplay:  # Observer
-# #     def __init__(self,weatherData):
-#     def observe(self,weatherData):
-#         weatherData.measurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged), weatherData)
-# #     def observe(self,bound_method):
-# #         bound_method.__self__.measurementsChanged = types.MethodType(self.register(bound_method), bound_method.__self__)   
-# #     def register(self,f):
-# #         
-# #         
-# #         def g(this):
-# #             f()
-# #             return self.update(this)
-# #         return g
-#     def update(self,this):
-#         self.temperature = this.temperature
-#         self.humidity = this.humidity
-#         self.display()
-#     def display(self):
-#         print("Current conditions: {}F degrees and {}% humidity".format(self.temperature, self.humidity))
-# class ForecastDisplay:
-#     def __init__(self):
-# #     def __init__(self,weatherData):
-# #         weatherData.measurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged), weatherData)
-#         self.currentPressure = 29.92
-#     def observe(self,weatherData):
-#         weatherData.measurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged), weatherData)
-# #     def observe(self,bound_method):
-# #         bound_method = types.MethodType(self.register(bound_method), bound_method.__self__)    
-#     def register(self,f):
-#         def g(this):
-#             f()
-#             return self.update(this)
-#         return g        
-#     def update(self,this):
-#         self.lastPressure = self.currentPressure
-#         self.currentPressure = this.pressure
-#         self.display()
-#     def display(self):
-#         print("Forecast: ");
-#         if self.currentPressure > self.lastPressure:
-#             print("Improving weather on the way!")
-#         elif self.currentPressure == self.lastPressure:
-#             print("More of the same");
-#         elif self.currentPressure < self.lastPressure:
-#             print("Watch out for cooler, rainy weather")
-# class StatisticsDisplay:
-#     def __init__(self):
-# #     def __init__(self,weatherData):
-# #         weatherData.measurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged), weatherData)
-#         self.maxTemp = 0.0
-#         self.minTemp = 200
-#         self.tempSum = 0.0
-#         self.numReadings = 0
-#     def observe(self,weatherData):
-#         weatherData.measurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged), weatherData)
-#     def register(self,f):
-#         def g(this):
-#             f()
-#             return self.update(this)
-#         return g          
-#     def update(self,this):
-#         self.tempSum += this.temperature
-#         self.numReadings += 1
-#         if this.temperature > self.maxTemp:
-#             self.maxTemp = this.temperature
-#         if this.temperature < self.minTemp:
-#             self.minTemp = this.temperature
-#         self.display()
-#     def display(self):
-#         print("Avg/Max/Min temperature = {}/{}/{}".format(self.tempSum/self.numReadings, self.maxTemp, self.minTemp))
-# class HeatIndexDisplay:
-#     def __init__(self):
-# #     def __init__(self,weatherData):
-# #         weatherData.measurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged), weatherData)
-#         self.heatIndex = 0.0
-#     def observe(self,weatherData):
-#         weatherData.measurementsChanged = types.MethodType(self.register(weatherData.measurementsChanged), weatherData)
-#     def register(self,f):
-#         def g(this):
-#             f()
-#             return self.update(this)
-#         return g           
-#     def update(self,this):
-#         self.heatIndex = self.computeHeatIndex(this.temperature,this.humidity)
-#         self.display()
-#     def computeHeatIndex(self,t,rh):
-#         return (16.923 + (0.185212 * t) + (5.37941 * rh) - (0.100254 * t * rh) + (0.00941695 * (t * t)) + (0.00728898 * (rh * rh)) + (0.000345372 * (t * t * rh)) - (0.000814971 * (t * rh * rh)) + (0.0000102102 * (t * t * rh * rh)) - (0.000038646 * (t * t * t)) + (0.0000291583 * (rh * rh * rh)) + (0.00000142721 * (t * t * t * rh)) + (0.000000197483 * (t * rh * rh * rh)) - (0.0000000218429 * (t * t * t * rh * rh)) + 0.000000000843296 * (t * t * rh * rh * rh)) - (0.0000000000481975 * (t * t * t * rh * rh * rh))
-#     def display(self):
-#         print("Heat index is {}".format(self.heatIndex))      
-# 
-# 
-# if __name__ == '__main__':
-#     
-# #     def register(self):
-# #         callbacks = list()
-# #         def g(this):
-# #             callbacks.append(self.update(this))
-# #             return lambda callbacks: [fn() for fn in callbacks]
-# #         return g    
-# 
-# 
-# 
-# 
-# 
-#     weatherData = WeatherData()
-# #     currentDisplay = CurrentConditionsDisplay(weatherData)
-# #     statisticsDisplay = StatisticsDisplay(weatherData)
-# #     forecastDisplay = ForecastDisplay(weatherData)
-# #     heatIndexDisplay = HeatIndexDisplay(weatherData)
-# 
-# 
-#     currentDisplay = CurrentConditionsDisplay()
-#     statisticsDisplay = StatisticsDisplay()
-#     forecastDisplay = ForecastDisplay()
-#     heatIndexDisplay = HeatIndexDisplay()
-#     
-#     
-#     currentDisplay.observe(weatherData)
-#     statisticsDisplay.observe(weatherData)
-#     forecastDisplay.observe(weatherData)
-#     heatIndexDisplay.observe(weatherData)
-#     
-# #     weatherData = WeatherData()
-# #     currentDisplay.observe(weatherData)
-#     
-#     
-# #     forecastDisplay.update = types.MethodType(lambda :pass, forecastDisplay)
-#     
-#     
-#     
-#     weatherData.setMeasurements(80, 65, 30.4)
-#     print()
-#     weatherData.setMeasurements(82, 70, 29.2)
-#     print()
-#     weatherData.setMeasurements(78, 90, 29.2)
-#     
