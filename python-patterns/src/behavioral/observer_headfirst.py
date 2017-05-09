@@ -87,7 +87,7 @@ class Observe:  # Observer Broker
         if observer_m not in self._observer_ms:
             self._observer_ms.append(observer_m)
         self._observe()  # Replace the Subject method    
-    def _register(self,f):
+    def _decorator(self,f):
         '''
         Decorator of the Subject method
         :param f: the Subject method
@@ -95,8 +95,8 @@ class Observe:  # Observer Broker
         :returns: Function to be replaced with the Subject method
         :rtype: Function Object
         '''
-        def g(this,*args):
-            return self._execute(this,f,*args)        
+        def g(this,*args,**kwargs):
+            return self._execute(this,f,*args,**kwargs)        
         return g
     def remove(self, observer_m):
         '''
@@ -108,14 +108,14 @@ class Observe:  # Observer Broker
         '''
         if observer_m in self._observer_ms:
             self._observer_ms.remove(observer_m)
-    def _observe(self):  # Subjectのメソッドをself._registerに置換する。
+    def _observe(self):  # Subjectのメソッドをself._decoratorでself._executeに置換する。
         '''
         Replace the Subject method
         :returns: None
         :rtype: None
         '''
-        setattr(self.subject, self.subject_m_name, types.MethodType(self._register(self.subject_m), self.subject))
-    def _execute(self,this,f,*args):  # Subjectのメソッドと入れ替わる関数。*argsは元のSubjectのメソッドの引数。
+        setattr(self.subject, self.subject_m_name, types.MethodType(self._decorator(self.subject_m), self.subject))
+    def _execute(self,this,f,*args,**kwargs):  # Subjectのメソッドと入れ替わる関数。*argsは元のSubjectのメソッドの引数。
         '''
         Function to be replaced with the Subject method
         :param this: Subject
@@ -125,7 +125,7 @@ class Observe:  # Observer Broker
         :returns: None
         :rtype: None
         '''
-        f(*args)  # 置換する前のSubjectのメソッドをまず実行。
+        f(*args,**kwargs)  # 置換する前のSubjectのメソッドをまず実行。
         for observer_m in self._observer_ms:  # Observerのリストにあるメソッドをすべて実行する。
             observer_m(this)    
                     
